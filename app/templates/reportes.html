@@ -29,7 +29,6 @@
         .button {
             width: 120px;
             height: 70px;
-            background: #ffcccb;
             border: 2px solid #888;
             border-radius: 5px;
             font-size: 16px;
@@ -37,24 +36,76 @@
             cursor: pointer;
             transition: 0.3s;
         }
+        .button-ok {
+            background-color: #d1ffd1; /* Verde claro */
+        }
+        .button-report {
+            background-color:rgb(238, 255, 4); /* Rojo claro */
+        }
+        .button-stopped {
+            background-color:rgb(255, 4, 4); /* Gris claro */
+        }
         .button:hover {
-            background: #ff9999;
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Reportar elemento de la linea</h2>
+        <h2>Reportar elemento de la línea</h2>
         <div class="buttons" id="buttons">
-            <!-- Botones generados dinámicamente -->
-            <script>
-                for (let i = 1; i <= 21; i++) {
-                    document.write(`
-                        <button class="button" id="btn-${i}">Item ${i}</button>
-                    `);
-                }
-            </script>
+            {% for i in range(1, 22) %}
+                <button class="button" id="btn-{{ i }}" onClick="reportarElemento({{ i }})">
+                    {% if productos[i-1] %}
+                        Item {{ i }} - {{ productos[i-1].estatus }}
+                    {% else %}
+                        Item {{ i }} - Sin datos
+                    {% endif %}
+                </button>
+            {% endfor %}
         </div>
     </div>
+
+    <script>
+        function actualizarBanda() {
+            fetch('/api/obtener_banda')
+                .then(response => response.json())
+                .then(data => {
+                    const productos = data.productos;
+                    for (let i = 0; i < 21; i++) {
+                        const button = document.getElementById(`btn-${i + 1}`);
+                        if (productos[i]) {
+                            button.textContent = `Item ${i + 1} - ${productos[i].estatus}`;
+                            // Remover clases previas y agregar la clase correspondiente
+                            button.classList.remove('button-ok', 'button-report', 'button-stopped');
+                            if (productos[i].estatus === 'ok') {
+                                button.classList.add('button-ok');
+                            } else if (productos[i].estatus === 'report') {
+                                button.classList.add('button-report');
+                            } else if (productos[i].estatus === 'stopped') {
+                                button.classList.add('button-stopped');
+                            }
+                        } else {
+                            button.textContent = `Item ${i + 1} - Sin datos`;
+                            button.classList.remove('button-ok', 'button-report', 'button-stopped');
+                        }
+                    }
+                });
+        }
+
+        function reportarElemento(id) {
+            fetch(`/api/status/${id}/report`, { method: 'PUT' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        alert(`Elemento ${id} reportado exitosamente.`);
+                    } else {
+                        alert(`Error al reportar el elemento ${id}.`);
+                    }
+                });
+        }
+
+        setInterval(actualizarBanda, 3000); // Se actualiza cada 3 segundos
+    </script>
 </body>
 </html>

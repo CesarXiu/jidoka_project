@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, jsonify
-from app.services import obtener_banda
+from app.services.bandService import obtener_banda
 
 main = Blueprint('main', __name__)
 
@@ -19,7 +19,8 @@ def banda():
 
 @main.route('/reportes')
 def botones():
-    return render_template('reportes.html')
+    productos = obtener_banda()
+    return render_template('reportes.html',productos=productos)
 
 @main.route('/supervisor')
 def supervisores():
