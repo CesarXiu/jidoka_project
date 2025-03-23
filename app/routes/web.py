@@ -1,6 +1,12 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, jsonify
+from app.services import obtener_banda
 
 main = Blueprint('main', __name__)
+
+#@main.route('/obtener_banda', methods=['GET'])
+#def obtener_banda():
+#    return jsonify({"data": banda.obtener_productos()})
+
 
 @main.route('/')
 def home():
@@ -8,7 +14,8 @@ def home():
 
 @main.route('/banda')
 def banda():
-    return render_template('banda.html')
+    productos = obtener_banda()
+    return render_template('banda.html', productos=productos)
 
 @main.route('/reportes')
 def botones():

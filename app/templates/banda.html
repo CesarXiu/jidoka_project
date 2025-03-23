@@ -30,17 +30,6 @@
             gap: 50px;
             margin-top: 20px;
         }
-        .slot {
-            width: 50px;
-            height: 80px;
-            background: #d1ffd1;
-            border: 2px solid #888;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 5px;
-        }
         .data-slot {
             width: 90px;
             height: 80px;
@@ -64,14 +53,26 @@
             border-radius: 5px;
             text-align: center;
         }
+        .slot {
+            width: 50px;
+            height: 80px;
+            background: #d1ffd1;
+            border: 2px solid #888;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+        }
+        .color-default {
+            background-color: #d1ffd1;
+        }
+        .color-ok {
+            background-color:rgb(25, 243, 36);
+        }
         .slot span {
             font-size: 14px;
             font-weight: bold;
-        }
-        .id {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #333;
         }
         .init {
             margin-top: 20px;
@@ -85,26 +86,48 @@
             cursor: pointer;
             font-size: 16px;
         }
+        .ok {
+            margin-top: 5px;
+            font-size: 12px;
+            background-color:rgb(43, 248, 105);
+            color: #333;
+        }
+        .warning {
+            margin-top: 5px;
+            font-size: 12px;
+            background-color:rgb(244, 241, 54);
+            color: #333;
+        }
+        .error {
+            margin-top: 5px;
+            font-size: 12px;
+            background-color:rgb(255, 0, 0);
+            color: #333;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Pantalla Principal - Banda Transportadora</h2>
         <div class="band" id="band">
-            <!-- Espacios para los 21 productos -->
-            <script>
-                for (let i = 1; i <= 21; i++) {
-                    document.write(`
-                        <div class="slot" id="slot-${i}">
-                            <span>${i}</span>
-                            <span>----</span>
-                            <span class="id" id="product-${i}">#</span>
-                        </div>
-                    `);
-                }
-            </script>
+            {% for i in range(1, 22) %}
+                <div class="slot color-{{ productos[i-1].estatus if productos[i-1] and productos[i-1].estatus else 'default' }}">
+                    <span>{{ i }}</span> <!-- Número fijo del 1 al 21 -->
+                    <span id="slot-{{ i }}">
+                        {% if productos[i-1] %}
+                            #{{ productos[i-1]["id"] }}
+                        {% else %}
+                            #
+                        {% endif %}
+                    </span>
+                </div>
+            {% endfor %}
         </div>
 
+        <div class="init">
+            <button onClick="iniciar_banda()">Iniciar</button>
+            <button onClick="detener_banda()">Detener</button>
+        </div>
         <div class="data">
             <div class="data-slot" id="OA"><!--OA (Operational Availability / Disponibilidad Operacional) → Porcentaje de tiempo que la línea está en funcionamiento sin paradas.-->
                 <span>OA</span>
@@ -123,12 +146,54 @@
                 <input type="number" id="TM-I" value="100" readonly>
             </div>
         </div>
-
-        <div class="init">
-            <button onclick="start()">Iniciar</button>
-            <button onclick="stop()">Detener</button>
-        </div>
-
     </div>
+
+    <script>
+        function iniciar_banda() {
+            fetch('/api/iniciar_banda', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        actualizarBanda();
+                    } else {
+                        alert('Error al iniciar la banda');
+                    }
+                });
+        }
+
+        function detener_banda() {
+            fetch('/api/detener_banda', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        alert('Banda detenida');
+                    } else {
+                        alert('Error al detener la banda');
+                    }
+                });
+        }
+
+        function actualizarBanda() {
+            fetch('/api/obtener_banda')
+            .then(response => response.json())
+            .then(data => {
+                const productos = data.productos;
+                for (let i = 0; i < 21; i++) {
+                    const slot = document.getElementById(`slot-${i + 1}`);
+                    if (productos[i]) {
+                        slot.textContent = `#${productos[i].id}`;
+                        const slotDiv = slot.parentElement;
+                        slotDiv.className = `slot color-${productos[i].estatus}`;
+                    } else {
+                        slot.textContent = "#";
+                        const slotDiv = slot.parentElement;
+                        slotDiv.className = "slot color-default";
+                    }
+                }
+            });
+            }
+
+        setInterval(actualizarBanda, 3000); // Se actualiza cada 5 segundos
+    </script>
 </body>
 </html>
