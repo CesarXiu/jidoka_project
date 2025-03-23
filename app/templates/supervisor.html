@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interfaz de Supervisores - Jidoka</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 90%;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .button {
+            width: 120px;
+            height: 70px;
+            background: #ffcccb;
+            border: 2px solid #888;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .button:hover {
+            background: #ff9999;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        .modal button {
+            width: 120px;
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .liberate {
+            background: #4CAF50;
+            color: white;
+        }
+        .remove {
+            background: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Interfaz de Supervisores</h2>
+        <div class="buttons" id="buttons">
+            <script>
+                for (let i = 1; i <= 21; i++) {
+                    document.write(`
+                        <button class="button" id="btn-${i}" onclick="openModal(${i})">Item ${i}</button>
+                    `);
+                }
+            </script>
+        </div>
+    </div>
+    
+    <div class="modal" id="modal">
+        <p id="modal-text">Acciones para el producto</p>
+        <button class="liberate" onclick="liberateProduct()">Liberar</button>
+        <button class="remove" onclick="removeProduct()">Retirar</button>
+    </div>
+
+    <script>
+        let selectedProduct = null;
+        
+        function openModal(productId) {
+            selectedProduct = productId;
+            document.getElementById('modal-text').innerText = `Acciones para el Item ${productId}`;
+            document.getElementById('modal').style.display = 'block';
+        }
+        
+        function liberateProduct() {
+            alert(`Producto ${selectedProduct} liberado.`);
+            document.getElementById('modal').style.display = 'none';
+        }
+        
+        function removeProduct() {
+            alert(`Producto ${selectedProduct} retirado de la línea de producción.`);
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

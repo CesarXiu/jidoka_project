@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pantalla Principal - Jidoka</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .band {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .data {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin-top: 20px;
+        }
+        .slot {
+            width: 50px;
+            height: 80px;
+            background: #d1ffd1;
+            border: 2px solid #888;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+        }
+        .data-slot {
+            width: 90px;
+            height: 80px;
+            background: #d1ffd1;
+            border: 2px solid #888;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+        }
+        .data-slot span {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .data-slot input {
+            margin-top: 20px;
+            width: 50px;
+            height: 20px;
+            border: 1px solid #888;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .slot span {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .id {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #333;
+        }
+        .init {
+            margin-top: 20px;
+        }
+        .init button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Pantalla Principal - Banda Transportadora</h2>
+        <div class="band" id="band">
+            <!-- Espacios para los 21 productos -->
+            <script>
+                for (let i = 1; i <= 21; i++) {
+                    document.write(`
+                        <div class="slot" id="slot-${i}">
+                            <span>${i}</span>
+                            <span>----</span>
+                            <span class="id" id="product-${i}">#</span>
+                        </div>
+                    `);
+                }
+            </script>
+        </div>
+
+        <div class="data">
+            <div class="data-slot" id="OA"><!--OA (Operational Availability / Disponibilidad Operacional) → Porcentaje de tiempo que la línea está en funcionamiento sin paradas.-->
+                <span>OA</span>
+                <input type="number" id="OA-I" value="100" readonly>
+            </div>
+            <div class="data-slot" id="RR"><!--RR (Rework Rate / Tasa de Retrabajo) → Cantidad de productos que requirieron correcciones o reparaciones.-->
+                <span>RR</span>
+                <input type="number" id="RR-I" value="100" readonly>
+            </div>
+            <div class="data-slot" id="OT"><!--Overtime (Tiempo Extra) → Minutos adicionales trabajados fuera del horario normal para cumplir con la producción.-->
+                <span>OVERTIME</span>
+                <input type="number" id="OT-I" value="100" readonly>
+            </div>
+            <div class="data-slot" id="TM"><!--Time (Tiempo Actual) → La hora en tiempo real.-->
+                <span>TIME</span>
+                <input type="number" id="TM-I" value="100" readonly>
+            </div>
+        </div>
+
+        <div class="init">
+            <button onclick="start()">Iniciar</button>
+            <button onclick="stop()">Detener</button>
+        </div>
+
+    </div>
+</body>
+</html>
