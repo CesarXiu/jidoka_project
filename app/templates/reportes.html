@@ -97,10 +97,10 @@
             fetch(`/api/status/${id}/report`, { method: 'PUT' })
                 .then(response => response.json())
                 .then(data => {
-                    if (data) {
+                    if (!data.error) {
                         alert(`Elemento ${id} reportado exitosamente.`);
                     } else {
-                        alert(`Error al reportar el elemento ${id}.`);
+                        alert(`Error al reportar el elemento ${id}.\n${data.error}`);
                     }
                 });
         }

@@ -113,7 +113,8 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="container">
+        <h1></h1>
         <h2>Pantalla Principal - Banda Transportadora</h2>
         <div class="band" id="band">
             {% for i in range(1, 22) %}
@@ -183,21 +184,39 @@
             fetch('/api/obtener_banda')
             .then(response => response.json())
             .then(data => {
-                const productos = data.productos;
-                for (let i = 0; i < 21; i++) {
-                    const slot = document.getElementById(`slot-${i + 1}`);
-                    if (productos[i]) {
-                        slot.textContent = `#${productos[i].id}`;
-                        const slotDiv = slot.parentElement;
-                        slotDiv.className = `slot color-${productos[i].estatus}`;
-                    } else {
-                        slot.textContent = "#";
-                        const slotDiv = slot.parentElement;
-                        slotDiv.className = "slot color-default";
-                    }
+            const productos = data.productos;
+            let stoppedDetected = false;
+            let stoppedItem = null;
+
+            for (let i = 0; i < 21; i++) {
+                const slot = document.getElementById(`slot-${i + 1}`);
+                if (productos[i]) {
+                slot.textContent = `#${productos[i].id}`;
+                const slotDiv = slot.parentElement;
+                slotDiv.className = `slot color-${productos[i].estatus}`;
+
+                if (productos[i].estatus === 'stopped') {
+                    stoppedDetected = true;
+                    stoppedItem = i + 1;
                 }
-            });
+                } else {
+                slot.textContent = "#";
+                const slotDiv = slot.parentElement;
+                slotDiv.className = "slot color-default";
+                }
             }
+
+            const alertContainer = document.getElementById('container');
+            const alertMessage = alertContainer.querySelector('h1');
+            if (stoppedDetected) {
+                alertContainer.style.backgroundColor = 'rgba(255, 95, 95, 0.5)'; // Color de fondo rojo
+                alertMessage.textContent = `Se ha pausado la producción, resolver el item número #${stoppedItem}`;
+            } else {
+                alertContainer.style.backgroundColor = 'transparent';
+                alertMessage.textContent = '';
+            }
+            });
+        }
 
         setInterval(actualizarBanda, 3000); // Se actualiza cada 5 segundos
     </script>

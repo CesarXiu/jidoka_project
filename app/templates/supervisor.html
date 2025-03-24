@@ -85,13 +85,15 @@
     <div class="container">
         <h2>Interfaz de Supervisores</h2>
         <div class="buttons" id="buttons">
-            <script>
-                for (let i = 1; i <= 21; i++) {
-                    document.write(`
-                        <button class="button" id="btn-${i}" onclick="openModal(${i})">Item ${i}</button>
-                    `);
-                }
-            </script>
+            {% for i in range(1, 22) %}
+                <button class="button" id="btn-{{ i }}" onclick="openModal({{ i }})">
+                    {% if productos[i-1] %}
+                        Item {{ i }} - {{ productos[i-1].estatus }}
+                    {% else %}
+                        Item {{ i }} - Sin datos
+                    {% endif %}
+                </button>
+            {% endfor %}
         </div>
     </div>
     
@@ -144,10 +146,10 @@
             fetch(`/api/status/${id}/release`, { method: 'PUT' })
                 .then(response => response.json())
                 .then(data => {
-                    if (data) {
+                    if (!data.error) {
                         alert(`Elemento ${id} liberado exitosamente.`);
                     } else {
-                        alert(`Error al liberar el elemento ${id}.`);
+                        alert(`Error al liberar el elemento ${id}. \n${data.error}`);
                     }
                 });
             document.getElementById('modal').style.display = 'none';
@@ -157,10 +159,10 @@
             fetch(`/api/status/${id}/remove`, { method: 'PUT' })
                 .then(response => response.json())
                 .then(data => {
-                    if (data) {
+                    if (!data.error) {
                         alert(`Elemento ${id} reportado exitosamente.`);
                     } else {
-                        alert(`Error al reportar el elemento ${id}.`);
+                        alert(`Error al reportar el elemento ${id}. \n${data.error}`);
                     }
                 });
             document.getElementById('modal').style.display = 'none';
