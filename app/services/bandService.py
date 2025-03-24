@@ -1,19 +1,23 @@
 import time
 from threading import Thread
 from app.models.band import Banda
+from app.models.operational import Operational 
 
-banda = Banda()
+banda = Banda() # Instancia de la banda transportadora
+operacional = Operational() # Instancia de la clase Operational para manejar la disponibilidad operativa
+
 banda_activa = False  # Variable de control para iniciar/detener la banda
 reportados = {}  # Diccionario para rastrear elementos reportados y su tiempo de reporte
 
 def iniciar_banda():
     global banda_activa
     banda_activa = True  # Activa la banda
-
+    operacional.production_start()  # Inicia el tiempo de operación
     def run():
         while banda_activa:
             verificar_reportados() # Verifica si hay elementos reportados que exceden el tiempo permitido
             banda.avanzar()
+            operacional.register_inspected_product()  # Registra el producto inspeccionado
             time.sleep(30)  # Simula el avance cada 30 segundos
 
     thread = Thread(target=run, daemon=True)
@@ -21,10 +25,13 @@ def iniciar_banda():
 
 def detener_banda():
     global banda_activa
+    operacional.production_stop()  # Detiene el tiempo de operación
     banda_activa = False  # Detiene la banda
 
 def obtener_banda():
     return banda.obtener_estado()
+def datos_operacionales():
+    return operacional.get_times()
 
 def actualizar_item(posicion, nuevo_estatus):
     """
@@ -51,6 +58,7 @@ def actualizar_item(posicion, nuevo_estatus):
 
             # Manejar el diccionario de reportados
             if nuevo_estatus == "report":
+                operacional.report_reworked_product()  # Registra el producto como retrabajado
                 reportados[producto.id] = {"time": time.time(), "posicion": posicion}
                 print(f"Producto con ID {producto.id} reportado en posición {posicion}.")
             elif nuevo_estatus == "ok":

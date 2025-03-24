@@ -150,7 +150,7 @@
             </div>
             <div class="data-slot" id="TM"><!--Time (Tiempo Actual) → La hora en tiempo real.-->
                 <span>TIME</span>
-                <input type="number" id="TM-I" value="100" readonly>
+                <input type="text" id="TM-I" value="" readonly>
             </div>
         </div>
     </div>
@@ -212,12 +212,30 @@
                 alertContainer.style.backgroundColor = 'rgba(255, 95, 95, 0.5)'; // Color de fondo rojo
                 alertMessage.textContent = `Se ha pausado la producción, resolver el item número #${stoppedItem}`;
             } else {
-                alertContainer.style.backgroundColor = 'transparent';
+                alertContainer.style.backgroundColor = 'white';
                 alertMessage.textContent = '';
             }
             });
         }
 
+        function actualizarOperacionales() {
+            fetch('/api/datos_operacionales')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('OA-I').value = data.OA;
+                    document.getElementById('RR-I').value = data.RR;
+                    document.getElementById('OT-I').value = data.OT;
+                });
+        }
+        function actualizarHoraActual() {
+            const ahora = new Date();
+            const hora = ahora.toLocaleTimeString(); // Obtiene la hora en formato local
+            document.getElementById('TM-I').value = hora; // Actualiza el campo TIME
+        }
+        
+        
+        setInterval(actualizarHoraActual, 1000);// Llama a la función cada segundo para mantener la hora actualizada
+        setInterval(actualizarOperacionales, 15000); // Se actualiza cada 15 segundos
         setInterval(actualizarBanda, 3000); // Se actualiza cada 5 segundos
     </script>
 </body>
