@@ -37,6 +37,15 @@
             cursor: pointer;
             transition: 0.3s;
         }
+        .button-ok {
+            background-color: #d1ffd1; /* Verde claro */
+        }
+        .button-report {
+            background-color:rgb(238, 255, 4); /* Rojo claro */
+        }
+        .button-stopped {
+            background-color:rgb(255, 4, 4); /* Gris claro */
+        }
         .button:hover {
             background: #ff9999;
         }
@@ -94,22 +103,69 @@
 
     <script>
         let selectedProduct = null;
-        
+        function actualizarBanda() {
+            fetch('/api/obtener_banda')
+                .then(response => response.json())
+                .then(data => {
+                    const productos = data.productos;
+                    for (let i = 0; i < 21; i++) {
+                        const button = document.getElementById(`btn-${i + 1}`);
+                        if (productos[i]) {
+                            button.textContent = `Item ${i + 1} - ${productos[i].estatus}`;
+                            // Remover clases previas y agregar la clase correspondiente
+                            button.classList.remove('button-ok', 'button-report', 'button-stopped');
+                            if (productos[i].estatus === 'ok') {
+                                button.classList.add('button-ok');
+                            } else if (productos[i].estatus === 'report') {
+                                button.classList.add('button-report');
+                            } else if (productos[i].estatus === 'stopped') {
+                                button.classList.add('button-stopped');
+                            }
+                        } else {
+                            button.textContent = `Item ${i + 1} - Sin datos`;
+                            button.classList.remove('button-ok', 'button-report', 'button-stopped');
+                        }
+                    }
+                });
+        }
         function openModal(productId) {
             selectedProduct = productId;
             document.getElementById('modal-text').innerText = `Acciones para el Item ${productId}`;
             document.getElementById('modal').style.display = 'block';
+
+            // Actualizar los botones del modal con el productId
+            const liberateButton = document.querySelector('.liberate');
+            const removeButton = document.querySelector('.remove');
+            liberateButton.setAttribute('onclick', `liberateProduct(${productId})`);
+            removeButton.setAttribute('onclick', `removeProduct(${productId})`);
         }
         
-        function liberateProduct() {
-            alert(`Producto ${selectedProduct} liberado.`);
+        function liberateProduct(id) {
+            fetch(`/api/status/${id}/release`, { method: 'PUT' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        alert(`Elemento ${id} liberado exitosamente.`);
+                    } else {
+                        alert(`Error al liberar el elemento ${id}.`);
+                    }
+                });
             document.getElementById('modal').style.display = 'none';
         }
         
-        function removeProduct() {
-            alert(`Producto ${selectedProduct} retirado de la línea de producción.`);
+        function removeProduct(id) {
+            fetch(`/api/status/${id}/remove`, { method: 'PUT' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data) {
+                        alert(`Elemento ${id} reportado exitosamente.`);
+                    } else {
+                        alert(`Error al reportar el elemento ${id}.`);
+                    }
+                });
             document.getElementById('modal').style.display = 'none';
         }
+        setInterval(actualizarBanda, 3000); // Se actualiza cada 3 segundos
     </script>
 </body>
 </html>

@@ -22,3 +22,10 @@ def release(posicion):
         return jsonify(actualizar_item_service(posicion, "ok")), 200
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
+    
+@item.route('/status/<int:posicion>/remove', methods=['PUT'])
+def remove(posicion):
+    try:
+        return jsonify(actualizar_item_service(posicion, "remove")), 200
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400

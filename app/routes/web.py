@@ -24,4 +24,5 @@ def botones():
 
 @main.route('/supervisor')
 def supervisores():
-    return render_template('supervisor.html')
+    productos = obtener_banda()
+    return render_template('supervisor.html',productos=productos)
